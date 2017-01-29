@@ -1,6 +1,7 @@
 Program can be modified by command line to run a different keyword for the weekly notification:
-
-java -jar StartAgendaBot.jar [keyword]     for runnable jars..
+ for example with runnable jars..
+ 
+java -jar StartAgendaBot.jar [keyword]
 
 but by default the keyword is “Ojibway”
 
