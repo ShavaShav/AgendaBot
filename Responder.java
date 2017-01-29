@@ -47,37 +47,39 @@ public class Responder implements Job {
 					}
 					// reply to tweet
 					String[] tokens = tweetResult.getText().trim().split(" ");
-			        if (tokens.length > 1){
-			        	String keyword = tokens[1]; // grab first word after @WindsorAlert
-			        	
-			        	// get list of contexts for keyword from Scraper to pick random tweet from
-			        	Scraper.CONTEXT_LENGTH = 140 - tweetResult.getUser().getScreenName().length() - AgendaBot.keyword.length() - 45; // see below
-			        	ArrayList<ContextPageNumber> contexts = Scraper.getContexts(new File("temp.pdf"), keyword); // "temp.pdf" must already exist! run main agendabot first
-			        	
-			        	String tweet = "";
-			        	
-			        	if (contexts.isEmpty()){
-			        		tweet = ".@" + tweetResult.getUser().getScreenName() // username to reply too
-		        					+ " Sorry, no mentions of " + keyword + " in the next agenda!";
+			        if (tokens[0].equals("@WindsorAlert")){
+			        	if (tokens.length > 1){
+			        		String keyword = tokens[1]; // grab first word after @WindsorAlert
+			        		
+			        		// get list of contexts for keyword from Scraper to pick random tweet from
+			        		Scraper.CONTEXT_LENGTH = 140 - tweetResult.getUser().getScreenName().length() - AgendaBot.keyword.length() - 45; // see below
+			        		ArrayList<ContextPageNumber> contexts = Scraper.getContexts(new File("temp.pdf"), keyword); // "temp.pdf" must already exist! run main agendabot first
+			        		
+			        		String tweet = "";
+			        		
+			        		if (contexts.isEmpty()){
+			        			tweet = ".@" + tweetResult.getUser().getScreenName() // username to reply too
+			        					+ " Sorry, no mentions of " + keyword + " in the next agenda!";
+			        		} else {
+			        			int randomContext = (int) Math.random() * contexts.size();
+			        			ContextPageNumber context = contexts.get(randomContext);
+			        			// 140 characters - excluding user name, context and link
+			        			tweet = ".@" + tweetResult.getUser().getScreenName() // username to reply too
+			        					+ "\".." + context.getContext()	// set to remainder of chars + 3
+			        					+ "..\"(Pg " + context.getPageNo()  // 10 chars
+			        					+ ") Link: " + Scraper.urlASCII		// 8 + 23 chars for URL (required for shortener)
+			        					+ "#page=" + context.getPageNo(); 	// links directly to page
+			        		}
+			        		// reply to the tweet
+			        		StatusUpdate statusUpdate = 
+			        				new StatusUpdate(tweet);
+			        		statusUpdate.inReplyToStatusId(tweetResult.getId());
+			        		
+			        		twitter.updateStatus(statusUpdate);
+			        		System.out.println("Replied to a tweet: \"" + tweet);		
 			        	} else {
-			        		int randomContext = (int) Math.random() * contexts.size();
-			        		ContextPageNumber context = contexts.get(randomContext);
-		        			// 140 characters - excluding user name, context and link
-		        			tweet = ".@" + tweetResult.getUser().getScreenName() // username to reply too
-		        					+ "\".." + context.getContext()	// set to remainder of chars + 3
-		        					+ "..\"(Pg " + context.getPageNo()  // 10 chars
-		        					+ ") Link: " + Scraper.urlASCII		// 8 + 23 chars for URL (required for shortener)
-		        					+ "#page=" + context.getPageNo(); 	// links directly to page
-			        	}
-	        			// reply to the tweet
-	        			StatusUpdate statusUpdate = 
-	        					new StatusUpdate(tweet);
-	        			statusUpdate.inReplyToStatusId(tweetResult.getId());
-	        			
-	        			twitter.updateStatus(statusUpdate);
-	        			System.out.println("Replied to a tweet: \"" + tweet);		
-			        } else {
-			        	System.out.println("Malformed query");
+			        		System.out.println("Malformed query");
+			        	}       	
 			        }
 				}
 			}
