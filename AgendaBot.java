@@ -15,7 +15,7 @@ import twitter4j.TwitterFactory;
 
 public class AgendaBot implements Job {
 
-	protected static String keyword = "Peter"; // competition keyword
+	protected static String keyword = "Ojibway"; // competition keyword
 	protected static int tweetsPerExecution = 5;
 	protected static int minutesWait = 30;
 	
