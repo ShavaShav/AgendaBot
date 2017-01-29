@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.ArrayList;
 
 import org.quartz.Job;
@@ -14,6 +15,8 @@ import twitter4j.TwitterFactory;
 
 public class Responder implements Job {
 
+	public static ArrayList<Status> cachedTweets = new ArrayList<Status>();
+	
 	@Override
 	public void execute(JobExecutionContext arg0) throws JobExecutionException {
 		//access the twitter API using your twitter4j.properties file
@@ -30,13 +33,15 @@ public class Responder implements Job {
 		    // get the newest tweet from those results
 	        Status tweetResult = result.getTweets().get(0);
 	        
+	        
+	        
 	        String[] tokens = tweetResult.getText().trim().split(" ");
 	        if (tokens.length > 1){
 	        	String keyword = tokens[1]; // grab first word after @WindsorAlert
 	        	
 	        	// get list of contexts for keyword from Scraper to pick random tweet from
 	        	Scraper.CONTEXT_LENGTH = 140 - tweetResult.getUser().getScreenName().length() - AgendaBot.keyword.length() - 45; // see below
-	        	ArrayList<ContextPageNumber> contexts = Scraper.getContexts(Scraper.currentAgenda, keyword);
+	        	ArrayList<ContextPageNumber> contexts = Scraper.getContexts(new File("temp.pdf"), keyword); // "temp.pdf" must already exist! run main agendabot first
 	        	
 	        	if (contexts.isEmpty()){
 	        		System.out.println("No mentions of " + keyword + " in the next agenda!");
