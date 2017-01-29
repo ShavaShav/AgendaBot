@@ -15,8 +15,9 @@ import twitter4j.TwitterFactory;
 
 public class AgendaBot implements Job {
 
-	protected static String keyword = "Ojibway"; // competition keyword
+	protected static String keyword = "Peter"; // competition keyword
 	protected static int tweetsPerExecution = 5;
+	protected static int minutesWait = 30;
 	
 	@Override
 	public void execute(JobExecutionContext arg0) throws JobExecutionException {
@@ -52,15 +53,15 @@ public class AgendaBot implements Job {
         		} catch (TwitterException e) {
         			// unable to tweet
         			if (e.getErrorCode() == 187)
-        				System.out.println("\"Already posted: " + tweet + "\"");
+        				System.out.println("Already posted: \"" + tweet + "\"");
         			else
         				e.printStackTrace();
         		}
         		
-        		// sleep for 30 minutes before posting next tweet about same agenda
+        		// sleep for minutesWait minutes before posting next tweet about same agenda
         		try {
-        			System.out.println("Waiting 15 minutes before next tweet...");
-					Thread.sleep(30 * 60 * 1000);
+        			System.out.println("Waiting "+minutesWait+" minutes before next scheduled tweet...");
+					Thread.sleep(minutesWait * 60 * 1000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
